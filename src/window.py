@@ -18,9 +18,10 @@
 import gettext
 import locale
 import os
+import re
 
 from gi.repository import Gtk
-from dotenv import dotenv_values
+
 
 locale.setlocale(locale.LC_ALL, "")
 locale.bindtextdomain("gnome-grub-settings", "locale/")
@@ -30,11 +31,49 @@ _ = gettext.gettext
 gettext.install("gnome-grub-settings", "locale/")
 
 
+def parse_file(file):
+    values = dict()
+    try:
+        f = open(file)
+    except IOError:
+        return values
+    else:
+        lines = f.readlines()
+        vlines = []
+        for line in lines:
+            if not re.match(r"^\s*$",line) and not re.match(r"^#.*$",line):
+                vlines.append(line.strip('\n'))
+        lines = []
+        while len(vlines) > 0:
+            i = vlines.pop(0)
+            i = re.sub(r"\s*#.*$","",i)
+            while i.endswith('\\'):
+                try:
+                    o = vlines.pop(0)
+                except IndexError:
+                    o = ""
+                i = i.rstrip('\\') + o.strip()
+            lines.append(i)
+
+        for opt in lines:
+            [name,val] = opt.split("=",1)
+            values[name] = val.strip('"')
+
+    return values
+
+
 class GrubSettingsWindow(object):
     def __init__(self, app):
         self.Application = app
+
+        if os.getenv("FLATPAK_ID"):
+            self.isFlatpak = True
         
-        self.GrubConfig = dotenv_values("/var/run/host/etc/default/grub")
+        self.GrubConfig = parse_file('/var/run/host/etc/default/grub')
+        self.GrubThemeLocations = [
+            "/usr/share/grub/themes/",
+            "/boot/grub/themes/",
+        ]
 
         gui_resource = "/com/tsbarnes/GrubSettings/window.ui"
         self.builder = Gtk.Builder().new_from_resource(gui_resource)
@@ -47,17 +86,31 @@ class GrubSettingsWindow(object):
         self.HeaderBar = self.builder.get_object("HeaderBar")
         self.ThemeList = self.builder.get_object("ThemeList")
 
-        self.ThemeListStore = Gtk.ListStore(str)
+        self.ThemeListStore = Gtk.ListStore(str, str)
         self.ThemeList.set_model(self.ThemeListStore)
+        self.ThemeList.set_id_column(0)
         
-        self.ThemeListStore.append(["None",])
-        for theme in os.listdir("/var/run/host/usr/share/grub/themes"):
-            self.ThemeListStore.append([theme,])
+        self.ThemeListStore.append(["", "None",])
         
-        if self.GrubConfig.has_key("GRUB_THEME"):
-            self.ThemeList.set_active(self.GrubConfig["GRUB_THEME"])
+        for location in self.GrubThemeLocations:
+            if self.isFlatpak:
+                path = "/var/run/host" + location
+            else:
+                path = location
+            try:
+                for theme in os.listdir(path):
+                    self.ThemeListStore.append([
+                        os.path.join(location, theme, "theme.txt"),
+                        theme,
+                    ])
+            except IOError as err:
+                print(err)
+        if not self.GrubConfig["GRUB_THEME"]:
+            self.GrubConfig["GRUB_THEME"] = ""
+
+        self.ThemeList.set_active_id(self.GrubConfig["GRUB_THEME"])
 
         renderer = Gtk.CellRendererText()
         self.ThemeList.pack_start(renderer, True)
-        self.ThemeList.add_attribute(renderer, "text", 0)
+        self.ThemeList.add_attribute(renderer, "text", 1)
 

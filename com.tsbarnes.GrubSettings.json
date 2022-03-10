@@ -33,8 +33,7 @@
                     "url" : "file:///home/thea/Projects/gnome-grub-settings"
                 }
             ]
-        },
-        "python3-requirements.json"
+        }
     ],
     "build-options" : {
         "env" : {        }
