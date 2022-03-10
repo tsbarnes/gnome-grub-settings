@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-grub-settings">
+	<schema id="com.tsbarnes.GrubSettings" path="/com/tsbarnes/GrubSettings/">
+	</schema>
+</schemalist>

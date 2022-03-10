@@ -1,0 +1,7 @@
+data/com.tsbarnes.GrubSettings.desktop.in
+data/com.tsbarnes.GrubSettings.appdata.xml.in
+data/com.tsbarnes.GrubSettings.gschema.xml
+src/window.ui
+src/main.py
+src/window.py
+
