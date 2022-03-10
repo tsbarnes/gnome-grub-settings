@@ -20,6 +20,7 @@ import locale
 import os
 
 from gi.repository import Gtk
+from dotenv import dotenv_values
 
 locale.setlocale(locale.LC_ALL, "")
 locale.bindtextdomain("gnome-grub-settings", "locale/")
@@ -32,6 +33,8 @@ gettext.install("gnome-grub-settings", "locale/")
 class GrubSettingsWindow(object):
     def __init__(self, app):
         self.Application = app
+        
+        self.GrubConfig = dotenv_values("/var/run/host/etc/default/grub")
 
         gui_resource = "/com/tsbarnes/GrubSettings/window.ui"
         self.builder = Gtk.Builder().new_from_resource(gui_resource)
@@ -51,7 +54,9 @@ class GrubSettingsWindow(object):
         for theme in os.listdir("/var/run/host/usr/share/grub/themes"):
             self.ThemeListStore.append([theme,])
         
-        self.ThemeList.set_active(0)
+        if self.GrubConfig.has_key("GRUB_THEME"):
+            self.ThemeList.set_active(self.GrubConfig["GRUB_THEME"])
+
         renderer = Gtk.CellRendererText()
         self.ThemeList.pack_start(renderer, True)
         self.ThemeList.add_attribute(renderer, "text", 0)
