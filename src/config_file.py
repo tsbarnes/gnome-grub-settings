@@ -2,30 +2,44 @@ import re
 
 
 class ConfigFile:
-    path = ""
-    values = dict()
+    """
+    This class is used to read and write the GRUB config file.
+    """
+    _path = ""
+    _values = dict()
     
     def __init__(self, path="/etc/default/grub"):
-        self.path = path
+        """
+        Initialize the ConfigFile instance.
+        :param path: string containing the path to the GRUB config file
+        """
+        self._path = path
         self.load_file()
 
     def __getitem__(self, item):
-        return self.values[item]
+        return self._values[item]
     
     def __setitem__(self, item, value):
-        self.values[item] = value
+        self._values[item] = value
+
+    def set_path(self, new_path, load=False):
+        self._path = new_path
+        if load:
+            self.load_file()
 
     def save_file(self):
+        """Save the GRUB config file."""
         # TODO: actually save the file
-        print("Saving config to: " + self.path)
+        print("Saving config to: " + self._path)
 
     def load_file(self):
-        self.values = dict()
+        """Load the GRUB config file"""
+        self._values = dict()
         try:
-            f = open(self.path)
+            f = open(self._path)
         except IOError as err:
             print(err)
-            return self.values
+            return self._values
         else:
             lines = f.readlines()
             vlines = []
@@ -46,7 +60,7 @@ class ConfigFile:
 
             for opt in lines:
                 [name,val] = opt.split("=",1)
-                self.values[name] = val.strip('"')
+                self._values[name] = val.strip('"')
 
-        return self.values
+        return self._values
 

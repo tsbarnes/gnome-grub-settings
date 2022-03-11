@@ -39,6 +39,10 @@ def sort_themes(theme):
 class GrubSettingsWindow(object):
     def apply_button_clicked(self, button):
         self.Config.save_file()
+        self.NotificationRevealer.set_reveal_child(True)
+    
+    def notification_close_button_clicked(self, button):
+        self.NotificationRevealer.set_reveal_child(False)
 
     def __init__(self, app):
         self.Application = app
@@ -64,6 +68,9 @@ class GrubSettingsWindow(object):
         self.MainWindow.set_application(self.Application)
         self.MainWindow.show()
 
+        self.NotificationRevealer = self.builder.get_object("NotificationRevealer")
+        self.NotificationCloseButton = self.builder.get_object("NotificationCloseButton")
+        self.NotificationCloseButton.connect("clicked", self.notification_close_button_clicked)
         self.HeaderBar = self.builder.get_object("HeaderBar")
         self.ThemeList = self.builder.get_object("ThemeList")
         self.ApplyButton = self.builder.get_object("ApplyButton")
