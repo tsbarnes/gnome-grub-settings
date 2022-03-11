@@ -29,6 +29,7 @@ gnome_grub_settings_sources = [
   '__init__.py',
   'main.py',
   'window.py',
+  'config_file.py'
 ]
 
 install_data(gnome_grub_settings_sources, install_dir: moduledir)
