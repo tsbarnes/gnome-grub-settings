@@ -50,7 +50,6 @@ class ConfigFile:
                 lines[index] = lines[index].strip('\n')
 
             contents: str = '\n'.join(lines)
-            print(contents)
             cancellable: Gio.Cancellable = Gio.Cancellable()
             data = GLib.Bytes.new(contents.encode('utf-8'))
             gio_file.replace_contents_bytes_async(
@@ -79,7 +78,7 @@ class ConfigFile:
     def save_file(self):
         """Save the GRUB config file."""
         try:
-            gio_file: Gio.File = Gio.File.new_for_uri("admin://" + self._path)
+            gio_file: Gio.File = Gio.File.new_for_uri("admin:///etc/default/grub")
             gio_file.mount_enclosing_volume(Gio.MountMountFlags.NONE, None, None, self.mount_cb)
         except GObject.GError as err:
             print(err)
