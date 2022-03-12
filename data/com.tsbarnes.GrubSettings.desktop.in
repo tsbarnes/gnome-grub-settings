@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=gnome-grub-settings
+Name=GRUB Settings
 Exec=gnome-grub-settings
 Icon=com.tsbarnes.GrubSettings
 Terminal=false

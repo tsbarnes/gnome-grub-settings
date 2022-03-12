@@ -26,9 +26,9 @@ from .window import GrubSettingsWindow
 
 
 class Application(Gtk.Application):
-    def __init__(self):
-        super().__init__(application_id='com.tsbarnes.GrubSettings',
-                         flags=Gio.ApplicationFlags.FLAGS_NONE)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, application_id='com.tsbarnes.GrubSettings',
+                         flags=Gio.ApplicationFlags.FLAGS_NONE, **kwargs)
 
     def do_activate(self):
         win = self.props.active_window

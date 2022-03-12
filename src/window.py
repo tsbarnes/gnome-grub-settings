@@ -39,10 +39,20 @@ def sort_themes(theme):
 class GrubSettingsWindow(object):
     def apply_button_clicked(self, button):
         self.Config.save_file()
+
+    def save_success(self):
+        self.NotificationLabel.set_text("Saved successfully")
+        self.NotificationRevealer.set_reveal_child(True)
+
+    def save_failed(self):
+        self.NotificationLabel.set_text("Failed to save")
         self.NotificationRevealer.set_reveal_child(True)
     
     def notification_close_button_clicked(self, button):
         self.NotificationRevealer.set_reveal_child(False)
+
+    def theme_list_changed(self, user_data):
+        self.Config["GRUB_THEME"] = self.ThemeList.get_active_id()
 
     def __init__(self, app):
         self.Application = app
@@ -54,7 +64,7 @@ class GrubSettingsWindow(object):
             self.isFlatpak = False
             self.ConfigPath = "/etc/default/grub"
 
-        self.Config = ConfigFile(self.ConfigPath)
+        self.Config = ConfigFile(self, self.ConfigPath)
         self.GrubThemeLocations = [
             "/usr/share/grub/themes/",
             "/boot/grub/themes/",
@@ -69,10 +79,12 @@ class GrubSettingsWindow(object):
         self.MainWindow.show()
 
         self.NotificationRevealer = self.builder.get_object("NotificationRevealer")
+        self.NotificationLabel = self.builder.get_object("NotificationLabel")
         self.NotificationCloseButton = self.builder.get_object("NotificationCloseButton")
         self.NotificationCloseButton.connect("clicked", self.notification_close_button_clicked)
         self.HeaderBar = self.builder.get_object("HeaderBar")
         self.ThemeList = self.builder.get_object("ThemeList")
+        self.ThemeList.connect("changed", self.theme_list_changed)
         self.ApplyButton = self.builder.get_object("ApplyButton")
         self.ApplyButton.connect("clicked", self.apply_button_clicked)
 
