@@ -1,9 +1,7 @@
 import os
 import re
 
-import gi
-gi.require_version("Polkit", "1.0")
-from gi.repository import Gtk, GLib, GObject, Gio, Polkit
+from gi.repository import Gtk, GLib, GObject, Gio
 
 
 class ConfigFile:
