@@ -1,7 +1,6 @@
-import os
 import re
 
-from gi.repository import Gtk, GLib, GObject, Gio
+from gi.repository import GLib, GObject, Gio
 
 
 class ConfigFile:
@@ -27,7 +26,7 @@ class ConfigFile:
         self._values[item] = value
 
     def mount_cb(self, gio_file, res):
-        result = gio_file.mount_enclosing_volume_finish(res)
+        gio_file.mount_enclosing_volume_finish(res)
         try:
             file = open(self._path)
         except IOError as err:
@@ -45,7 +44,7 @@ class ConfigFile:
                         lines[index] = option + "=\"" + self._values[option] + "\""
                         found = True
                 if not found:
-                    lines.append(option + "=\"" + self._values[option]) + "\""
+                    lines.append(option + "=\"{0}\"".format(self._values[option]))
 
             for index in range(0, len(lines)):
                 lines[index] = lines[index].strip('\n')
@@ -63,7 +62,7 @@ class ConfigFile:
                 self.save_cb
             )
 
-    def save_cb(self, gio_file: Gio.File, res: object) -> object:
+    def save_cb(self, gio_file: Gio.File, res: object):
         try:
             gio_file.replace_contents_finish(res)
         except GObject.GError as err:
@@ -86,7 +85,6 @@ class ConfigFile:
             print(err)
             return
 
-
     def load_file(self):
         """Load the GRUB config file"""
         self._values = dict()
@@ -99,12 +97,12 @@ class ConfigFile:
             lines = file.readlines()
             value_lines = []
             for line in lines:
-                if not re.match(r"^\s*$",line) and not re.match(r"^#.*$",line):
+                if not re.match(r"^\s*$", line) and not re.match(r"^#.*$", line):
                     value_lines.append(line.strip('\n'))
             lines = []
             while len(value_lines) > 0:
                 input_line = value_lines.pop(0)
-                input_line = re.sub(r"\s*#.*$","",input_line)
+                input_line = re.sub(r"\s*#.*$", "", input_line)
                 while input_line.endswith('\\'):
                     try:
                         output_line = value_lines.pop(0)
@@ -114,8 +112,7 @@ class ConfigFile:
                 lines.append(input_line)
 
             for option in lines:
-                [name,value] = option.split("=",1)
+                [name, value] = option.split("=", 1)
                 self._values[name] = value.strip('"')
 
         return self._values
-

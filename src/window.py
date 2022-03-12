@@ -54,6 +54,9 @@ class GrubSettingsWindow(object):
     def theme_list_changed(self, user_data):
         self.Config["GRUB_THEME"] = self.ThemeList.get_active_id()
 
+    def command_line_defaults_changed(self, user_data):
+        self.Config["GRUB_CMDLINE_LINUX_DEFAULT"] = self.CommandLineDefaultsEntry.get_text()
+
     def __init__(self, app):
         self.Application = app
 
@@ -82,11 +85,18 @@ class GrubSettingsWindow(object):
         self.NotificationLabel = self.builder.get_object("NotificationLabel")
         self.NotificationCloseButton = self.builder.get_object("NotificationCloseButton")
         self.NotificationCloseButton.connect("clicked", self.notification_close_button_clicked)
+
         self.HeaderBar = self.builder.get_object("HeaderBar")
-        self.ThemeList = self.builder.get_object("ThemeList")
-        self.ThemeList.connect("changed", self.theme_list_changed)
+
         self.ApplyButton = self.builder.get_object("ApplyButton")
         self.ApplyButton.connect("clicked", self.apply_button_clicked)
+
+        self.CommandLineDefaultsEntry = self.builder.get_object("CommandLineDefaultsEntry")
+        self.CommandLineDefaultsEntry.set_text(self.Config["GRUB_CMDLINE_LINUX_DEFAULT"])
+        self.CommandLineDefaultsEntry.connect("changed", self.command_line_defaults_changed)
+
+        self.ThemeList = self.builder.get_object("ThemeList")
+        self.ThemeList.connect("changed", self.theme_list_changed)
 
         self.ThemeListStore = Gtk.ListStore(str, str)
         self.ThemeList.set_model(self.ThemeListStore)
