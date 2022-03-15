@@ -68,6 +68,7 @@ class ConfigFile:
             print(err)
             self._window.save_failed()
         else:
+            # TODO: Run update-grub as administrator, maybe use PolicyKit?
             self._window.save_success()
 
     def set_path(self, new_path, load=False):
