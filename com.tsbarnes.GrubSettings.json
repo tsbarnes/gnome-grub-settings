@@ -32,7 +32,7 @@
             "sources" : [
                 {
                     "type" : "git",
-                    "url" : "file:///home/thea/Projects/gnome-grub-settings"
+                    "url" : "https://gitlab.gnome.org/tsbarnes/gnome-grub-settings.git"
                 }
             ]
         }
