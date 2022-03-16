@@ -4,7 +4,7 @@ variables:
     BUNDLE: "gnome-grub-settings.flatpak"
 
 flatpak:
-    image: 'registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:41.3'
+    image: 'registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:41'
     variables:
         MANIFEST_PATH: "dist/flatpak/com.tsbarnes.GrubSettings.json"
         MESON_ARGS: "-Dprofile=Devel"
