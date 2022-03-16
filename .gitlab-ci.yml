@@ -1,12 +1,12 @@
 include: 'https://gitlab.gnome.org/GNOME/citemplates/raw/master/flatpak/flatpak_ci_initiative.yml'
 
 variables:
-    BUNDLE: "gnome-grub-settings.flatpak"
+    BUNDLE: "GrubSettings.flatpak"
 
 flatpak:
     image: 'registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:41'
     variables:
-        MANIFEST_PATH: "dist/flatpak/com.tsbarnes.GrubSettings.json"
+        MANIFEST_PATH: "com.tsbarnes.GrubSettings.json"
         MESON_ARGS: "-Dprofile=Devel"
         FLATPAK_MODULE: "GrubSettings"
         RUNTIME_REPO: "https://flathub.org/repo/flathub.flatpakrepo"
