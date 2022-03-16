@@ -1,0 +1,25 @@
+include: 'https://gitlab.gnome.org/GNOME/citemplates/raw/master/flatpak/flatpak_ci_initiative.yml'
+
+variables:
+    BUNDLE: "gnome-grub-settings.flatpak"
+
+flatpak:
+    image: 'registry.gitlab.gnome.org/gnome/gnome-runtime-images/gnome:41.3'
+    variables:
+        MANIFEST_PATH: "dist/flatpak/com.tsbarnes.GrubSettings.json"
+        MESON_ARGS: "-Dprofile=Devel"
+        FLATPAK_MODULE: "GrubSettings"
+        RUNTIME_REPO: "https://flathub.org/repo/flathub.flatpakrepo"
+        APP_ID: "com.tsbarnes.GrubSettings"
+    extends: .flatpak
+
+review:
+    stage: deploy
+    dependencies:
+        - 'flatpak'
+    extends: '.review'
+
+stop_review:
+    stage: deploy
+    extends: '.stop_review'
+
