@@ -1,6 +1,14 @@
 import re
+import os
 
+import gi
 from gi.repository import GLib, GObject, Gio
+try:
+    gi.require_version('Polkit', '1.0')
+    from gi.repository import Polkit
+    DISABLE_POLKIT = False
+except ImportError:
+    DISABLE_POLKIT = True
 
 
 class ConfigFile:
@@ -26,7 +34,15 @@ class ConfigFile:
         self._values[item] = value
 
     def mount_cb(self, gio_file, res):
-        gio_file.mount_enclosing_volume_finish(res)
+        try:
+            gio_file.mount_enclosing_volume_finish(res)
+        except GLib.GError as err:
+            if err.code == 17:
+                self._write_to_file(gio_file)
+        else:
+            self._write_to_file(gio_file)
+
+    def _write_to_file(self, gio_file):
         try:
             file = open(self._path)
         except IOError as err:
@@ -68,8 +84,33 @@ class ConfigFile:
             print(err)
             self._window.save_failed()
         else:
-            # TODO: Run update-grub as administrator, maybe use PolicyKit?
-            self._window.save_success()
+            if DISABLE_POLKIT:
+                self._window.save_success()
+                return
+            authority = Polkit.Authority.get()
+            subject = Polkit.UnixProcess.new(os.getppid())
+
+            cancellable = Gio.Cancellable()
+
+            authority.check_authorization(subject,
+                "org.freedesktop.policykit.exec",
+                None,
+                Polkit.CheckAuthorizationFlags.ALLOW_USER_INTERACTION,
+                cancellable,
+                self.check_authorization_cb,
+                None)
+
+    def check_authorization_cb(self, authority, res, loop):
+        try:
+            result = authority.check_authorization_finish(res)
+            if result.get_is_authorized():
+                self._window.save_success()
+            elif result.get_is_challenge():
+                print("Challenge")
+            else:
+                self._window.flash_message("Couldn't update GRUB: Not authorized")
+        except GObject.GError as error:
+             self._window.flash_message("Error checking authorization: %s" % error.message)
 
     def set_path(self, new_path, load=False):
         self._path = new_path

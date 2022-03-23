@@ -37,6 +37,10 @@ def sort_themes(theme):
 
 
 class GrubSettingsWindow(object):
+    def flash_message(self, message):
+        self.NotificationLabel.set_text(message)
+        self.NotificationRevealer.set_reveal_child(True)
+
     def apply_button_clicked(self, button):
         self.Config.save_file()
 
